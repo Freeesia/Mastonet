@@ -91,6 +91,13 @@ public abstract partial class BaseHttpClient
         }
     }
 
+    protected async Task<T> Delete<T>(string route, IEnumerable<KeyValuePair<string, string>>? data = null)
+        where T : class
+    {
+        var content = await Delete(route, data);
+        return TryDeserialize<T>(content);
+    }
+
 
     protected async Task<string> Get(string route, IEnumerable<KeyValuePair<string, string>>? data = null)
     {

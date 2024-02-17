@@ -1,4 +1,5 @@
 ﻿using Mastonet.Entities;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Mastonet;
@@ -16,6 +17,15 @@ public enum AdminAccountStatus
     Disabled,
     Silenced,
     Suspended
+}
+
+public enum AdminActionType
+{
+    None,
+    Sensitive,
+    Disable,
+    Silence,
+    Suspend
 }
 
 public partial class MastodonClient
@@ -44,5 +54,31 @@ public partial class MastodonClient
         return GetMastodonList<AdminAccount>(url + queryParams);
     }
 
+    public Task<AdminAccount> DeleteAccount(string accountId)
+    {
+        return Delete<AdminAccount>($"/api/v1/admin/accounts/{accountId}");
+    }
 
+    public async Task PerformAccount(string accountId, AdminActionType action,
+        string? reportId = null, string? warningPresetId = null, string? text = null, bool send_email_notification = false)
+    {
+        var data = new Dictionary<string, string>
+        {
+            { "type", action.ToString().ToLowerInvariant() },
+            { "send_email_notification", send_email_notification.ToString().ToLowerInvariant() },
+        };
+        if (reportId != null)
+        {
+            data.Add("report_id", reportId);
+        }
+        if (warningPresetId != null)
+        {
+            data.Add("warning_preset_id", warningPresetId);
+        }
+        if (text != null)
+        {
+            data.Add("text", text);
+        }
+        await Post($"/api/v1/admin/accounts/{accountId}/action", data);
+    }
 }
