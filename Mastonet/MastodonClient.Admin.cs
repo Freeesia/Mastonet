@@ -97,7 +97,7 @@ public partial class MastodonClient
         var data = new Dictionary<string, string>
         {
             { "domain", domain },
-            { "action", action.ToString().ToLowerInvariant() },
+            { "severity", action.ToString().ToLowerInvariant() },
             { "reject_media", rejectMedia.ToString().ToLowerInvariant() },
             { "reject_reports", rejectReports.ToString().ToLowerInvariant() },
             { "obfuscate", obfuscate.ToString().ToLowerInvariant() },
