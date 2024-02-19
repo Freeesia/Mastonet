@@ -28,6 +28,13 @@ public enum AdminActionType
     Suspend
 }
 
+public enum AdminBlockDomainAction
+{
+    Noop,
+    Silence,
+    Suspend
+}
+
 public partial class MastodonClient
 {
     public Task<MastodonList<AdminAccount>> GetAdminAccounts(ArrayOptions? options = null, AdminAccountOrigin? origin = null,
@@ -80,5 +87,29 @@ public partial class MastodonClient
             data.Add("text", text);
         }
         await Post($"/api/v1/admin/accounts/{accountId}/action", data);
+    }
+
+    public Task AdminBlockDomain(string domain, AdminBlockDomainAction action = AdminBlockDomainAction.Silence,
+        bool rejectMedia = false, bool rejectReports = false,
+        string? privateComment = null, string? publicComment = null,
+        bool obfuscate = false)
+    {
+        var data = new Dictionary<string, string>
+        {
+            { "domain", domain },
+            { "action", action.ToString().ToLowerInvariant() },
+            { "reject_media", rejectMedia.ToString().ToLowerInvariant() },
+            { "reject_reports", rejectReports.ToString().ToLowerInvariant() },
+            { "obfuscate", obfuscate.ToString().ToLowerInvariant() },
+        };
+        if (privateComment != null)
+        {
+            data.Add("private_comment", privateComment);
+        }
+        if (publicComment != null)
+        {
+            data.Add("public_comment", publicComment);
+        }
+        return Post($"/api/v1/admin/domain_blocks", data);
     }
 }
